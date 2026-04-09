@@ -1,25 +1,9 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { ArrowRight, Mic, FileText, Share2, Clock, Shield, CheckCircle2, CreditCard } from 'lucide-react';
+import { ArrowRight, Mic, FileText, Share2, Clock, Shield, CheckCircle2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { startPayment } from '@/src/services/payment';
 
 export const LandingPage = () => {
-  const handleSubscribe = () => {
-    startPayment({
-      amount: 499,
-      currency: "INR",
-      name: "DischargeX",
-      description: "Monthly Subscription",
-      onSuccess: () => {
-        alert("Payment successful!");
-      },
-      onFailure: () => {
-        alert("Payment failed. Please try again.");
-      },
-    });
-  };
-
   return (
     <div className="flex flex-col">
       {/* Hero Section */}
@@ -37,19 +21,16 @@ export const LandingPage = () => {
               <p className="mt-6 text-lg leading-8 text-slate-600">
                 Use voice or text to create professional discharge reports instantly. DischargeX automates the paperwork so doctors can focus on patients.
               </p>
-              <div className="mt-10 flex flex-wrap items-center gap-4">
+              <div className="mt-10 flex items-center gap-x-6">
                 <Link
                   to="/dashboard"
                   className="rounded-full bg-blue-600 px-8 py-4 text-lg font-semibold text-white shadow-lg hover:bg-blue-700 transition-all flex items-center gap-2"
                 >
                   Try Now <ArrowRight className="h-5 w-5" />
                 </Link>
-                <button
-                  onClick={handleSubscribe}
-                  className="rounded-full border-2 border-blue-600 px-8 py-4 text-lg font-semibold text-blue-600 hover:bg-blue-50 transition-all flex items-center gap-2"
-                >
-                  Subscribe Now <CreditCard className="h-5 w-5" />
-                </button>
+                <Link to="/contact" className="text-sm font-semibold leading-6 text-slate-900 hover:text-blue-600 transition-colors">
+                  Book Demo <span aria-hidden="true">→</span>
+                </Link>
               </div>
               <div className="mt-10 flex items-center gap-4 text-sm text-slate-500">
                 <div className="flex -space-x-2">
@@ -130,54 +111,15 @@ export const LandingPage = () => {
         </div>
       </section>
 
-      {/* Pricing Section */}
-      <section className="bg-white py-24">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-base font-semibold leading-7 text-blue-600">Pricing</h2>
-            <p className="mt-2 text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
-              Simple, transparent pricing
-            </p>
-          </div>
-          <div className="mx-auto max-w-md rounded-3xl bg-white p-8 shadow-2xl ring-1 ring-slate-200 text-center">
-            <h3 className="text-xl font-bold text-slate-900">Monthly Plan</h3>
-            <p className="mt-4 flex items-baseline justify-center gap-x-2">
-              <span className="text-5xl font-bold tracking-tight text-slate-900">₹499</span>
-              <span className="text-sm font-semibold leading-6 text-slate-600">/month</span>
-            </p>
-            <ul className="mt-8 space-y-3 text-sm leading-6 text-slate-600">
-              <li className="flex items-center gap-3">
-                <CheckCircle2 className="h-5 w-5 text-blue-600" /> Unlimited Summaries
-              </li>
-              <li className="flex items-center gap-3">
-                <CheckCircle2 className="h-5 w-5 text-blue-600" /> Voice Recognition
-              </li>
-              <li className="flex items-center gap-3">
-                <CheckCircle2 className="h-5 w-5 text-blue-600" /> WhatsApp Sharing
-              </li>
-              <li className="flex items-center gap-3">
-                <CheckCircle2 className="h-5 w-5 text-blue-600" /> Professional PDF Branding
-              </li>
-            </ul>
-            <button
-              onClick={handleSubscribe}
-              className="mt-8 w-full rounded-full bg-blue-600 px-8 py-4 text-lg font-semibold text-white shadow-lg hover:bg-blue-700 transition-all flex items-center justify-center gap-2"
-            >
-              Subscribe Now <CreditCard className="h-5 w-5" />
-            </button>
-          </div>
-        </div>
-      </section>
-
       {/* How It Works */}
-      <section className="py-24 bg-slate-50">
+      <section className="py-24 bg-white">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl font-bold tracking-tight text-slate-900">How It Works</h2>
           </div>
           
           <div className="relative">
-            <div className="absolute top-1/2 left-0 w-full h-0.5 bg-slate-200 -translate-y-1/2 hidden lg:block" />
+            <div className="absolute top-1/2 left-0 w-full h-0.5 bg-slate-100 -translate-y-1/2 hidden lg:block" />
             <div className="grid grid-cols-1 gap-12 lg:grid-cols-3">
               {[
                 { step: '01', title: 'Input Details', desc: 'Enter or speak patient details into our smart form.' },
@@ -207,12 +149,12 @@ export const LandingPage = () => {
             Join hundreds of healthcare providers who use DischargeX to save time and improve patient care.
           </p>
           <div className="mt-10 flex items-center justify-center gap-x-6">
-            <button
-              onClick={handleSubscribe}
-              className="rounded-full bg-white px-8 py-3 text-lg font-semibold text-blue-600 shadow-sm hover:bg-blue-50 transition-all flex items-center gap-2"
+            <Link
+              to="/dashboard"
+              className="rounded-full bg-white px-8 py-3 text-lg font-semibold text-blue-600 shadow-sm hover:bg-blue-50 transition-all"
             >
-              Subscribe Now <CreditCard className="h-5 w-5" />
-            </button>
+              Get Started for Free
+            </Link>
             <Link to="/contact" className="text-sm font-semibold leading-6 text-white hover:text-blue-100">
               Contact Sales <span aria-hidden="true">→</span>
             </Link>

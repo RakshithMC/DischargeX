@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { motion } from 'motion/react';
 import { 
   FileText, 
@@ -12,14 +12,11 @@ import {
   Pill,
   Signature as SignatureIcon,
   CheckCircle2,
-  AlertCircle,
-  Lock,
-  CreditCard
+  AlertCircle
 } from 'lucide-react';
 import { VoiceInput } from '@/src/components/VoiceInput';
 import { parseVoiceInput, generateProfessionalSummary, PatientData } from '@/src/services/gemini';
 import { jsPDF } from 'jspdf';
-import { startPayment, checkPaymentStatus } from '@/src/services/payment';
 
 export const DashboardPage = () => {
   const [formData, setFormData] = useState<PatientData>({
@@ -38,27 +35,7 @@ export const DashboardPage = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [summary, setSummary] = useState('');
   const [showPreview, setShowPreview] = useState(false);
-  const [isPaid, setIsPaid] = useState(false);
   const previewRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    setIsPaid(checkPaymentStatus());
-  }, []);
-
-  const handleSubscribe = () => {
-    startPayment({
-      amount: 499,
-      currency: "INR",
-      name: "DischargeX",
-      description: "Monthly Subscription",
-      onSuccess: () => {
-        alert("Payment successful!");
-      },
-      onFailure: () => {
-        alert("Payment failed. Please try again.");
-      },
-    });
-  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -221,11 +198,6 @@ export const DashboardPage = () => {
 
   const downloadPDF = async () => {
     console.log("Download button clicked");
-    if (!isPaid) {
-      alert("Please subscribe to unlock the download feature.");
-      handleSubscribe();
-      return;
-    }
     if (!formData.patientName || !formData.diagnosis) {
       alert("Please fill patient details first");
       return;
@@ -258,11 +230,6 @@ export const DashboardPage = () => {
 
   const shareWhatsApp = async () => {
     console.log("WhatsApp button clicked");
-    if (!isPaid) {
-      alert("Please subscribe to unlock the WhatsApp sharing feature.");
-      handleSubscribe();
-      return;
-    }
     if (!formData.patientName || !formData.diagnosis) {
       alert("Please fill patient details first");
       return;
@@ -312,50 +279,20 @@ export const DashboardPage = () => {
   return (
     <div className="min-h-screen bg-slate-50 py-8 px-4 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl">
-        <div className="mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div className="mb-8 flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-slate-900">Patient Discharge Dashboard</h1>
             <p className="text-slate-500 text-sm">Create, preview, and share discharge summaries instantly.</p>
           </div>
-          <div className="flex items-center gap-3">
-            {!isPaid && (
-              <button
-                onClick={handleSubscribe}
-                className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-bold text-white hover:bg-blue-700 shadow-md transition-all"
-              >
-                <CreditCard className="h-4 w-4" /> Subscribe Now (₹499)
-              </button>
-            )}
-            <button 
-              onClick={() => setFormData({
-                patientName: '', age: '', gender: '', diagnosis: '', treatmentGiven: '', medications: '', doctorName: '', hospitalName: '', date: new Date().toISOString().split('T')[0]
-              })}
-              className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 transition-colors"
-            >
-              <RefreshCw className="h-4 w-4" /> Reset Form
-            </button>
-          </div>
+          <button 
+            onClick={() => setFormData({
+              patientName: '', age: '', gender: '', diagnosis: '', treatmentGiven: '', medications: '', doctorName: '', hospitalName: '', date: new Date().toISOString().split('T')[0]
+            })}
+            className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 transition-colors"
+          >
+            <RefreshCw className="h-4 w-4" /> Reset Form
+          </button>
         </div>
-
-        {!isPaid && (
-          <div className="mb-8 rounded-xl bg-blue-50 border border-blue-100 p-4 flex items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <div className="rounded-full bg-blue-100 p-2">
-                <Lock className="h-5 w-5 text-blue-600" />
-              </div>
-              <div>
-                <p className="text-sm font-bold text-blue-900">Premium Features Locked</p>
-                <p className="text-xs text-blue-700">Subscribe for ₹499/month to unlock PDF downloads and WhatsApp sharing.</p>
-              </div>
-            </div>
-            <button
-              onClick={handleSubscribe}
-              className="whitespace-nowrap rounded-lg bg-blue-600 px-4 py-2 text-xs font-bold text-white hover:bg-blue-700 transition-all"
-            >
-              Unlock Now
-            </button>
-          </div>
-        )}
 
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
           {/* Input Section */}
@@ -416,6 +353,7 @@ export const DashboardPage = () => {
                   <div className="relative">
                     <Stethoscope className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
                     <textarea
+                      id="patientDetails"
                       name="diagnosis"
                       value={formData.diagnosis}
                       onChange={handleInputChange}
@@ -497,7 +435,7 @@ export const DashboardPage = () => {
 
               <button
                 onClick={handleGenerate}
-                disabled={isGenerating || !formData.patientName || !isPaid}
+                disabled={isGenerating || !formData.patientName}
                 className="mt-8 w-full rounded-xl bg-blue-600 py-4 text-base sm:text-lg font-bold text-white shadow-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2 whitespace-nowrap"
               >
                 {isGenerating ? (
@@ -506,8 +444,7 @@ export const DashboardPage = () => {
                   </>
                 ) : (
                   <>
-                    {isPaid ? <FileText className="h-5 w-5" /> : <Lock className="h-5 w-5" />} 
-                    {isPaid ? 'Generate Discharge Summary' : 'Subscribe to Unlock Generation'}
+                    <FileText className="h-5 w-5" /> Generate Discharge Summary
                   </>
                 )}
               </button>
@@ -528,22 +465,16 @@ export const DashboardPage = () => {
                     <button
                       onClick={downloadPDF}
                       disabled={isGenerating}
-                      className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
-                        isPaid ? 'bg-slate-900 hover:bg-slate-800' : 'bg-slate-400'
-                      }`}
+                      className="flex items-center gap-2 rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      {isGenerating ? <RefreshCw className="h-4 w-4 animate-spin" /> : (isPaid ? <Download className="h-4 w-4" /> : <Lock className="h-4 w-4" />)} 
-                      {isPaid ? 'Download' : 'Unlock Download'}
+                      {isGenerating ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />} Download
                     </button>
                     <button
                       onClick={shareWhatsApp}
                       disabled={isGenerating}
-                      className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
-                        isPaid ? 'bg-green-600 hover:bg-green-700' : 'bg-slate-400'
-                      }`}
+                      className="flex items-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-sm font-semibold text-white hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      {isGenerating ? <RefreshCw className="h-4 w-4 animate-spin" /> : (isPaid ? <Share2 className="h-4 w-4" /> : <Lock className="h-4 w-4" />)} 
-                      {isPaid ? 'WhatsApp' : 'Unlock Share'}
+                      {isGenerating ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Share2 className="h-4 w-4" />} WhatsApp
                     </button>
                   </div>
                 </div>
