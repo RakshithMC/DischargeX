@@ -1,0 +1,5 @@
+{
+  "name": "DischargeX",
+  "description": "Smart & Instant Hospital Discharge Summaries using AI and Voice Input.",
+  "requestFramePermissions": ["microphone"]
+}
